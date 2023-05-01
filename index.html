@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Type Game</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Tangerine" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/estilos.css" rel="stylesheet">
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="text-align: center">
+    <div class="navbar-collapse" style="margin: 0 auto; text-align: center;">
+        <a class="navbar-brand" >PONTUAÇÃO:</a>
+        <p class="lead" style="color: white; font-weight: bold; margin-bottom: 0px" id="pontuacao">000000000
+        <span id="nivelJogo" style="font-weight: 400;"> (Médio)</span></p>
+    </div>
+    <audio id="musica" autoplay loop>
+        <source src="musicas/theme.mp3" type="audio/mp3">
+    </audio>
+    <audio id="musicaErro" autoplay>
+        <source src="musicas/error.mp3" type="audio/mp3">
+    </audio>
+    <audio id="musicaCerta" autoplay>
+        <source src="musicas/correct.mp3" type="audio/mp3">
+    </audio>
+
+</nav>
+
+<div class="container" style="margin-top: 10%">
+
+    <div class="form-group col-sm-6 col-md-2" id="campoGeradores">
+        <h1 class="lead" id="campoGerador" style="color: #dc354500;">-</h1>
+    </div>
+
+    <div id="btn-iniciar">
+        <button type="button" class="btn btn-success btn-lg" onclick="escondeInicio()">INICIAR</button>
+
+        <button id="btn-dificuldade" type="button" class="btn btn-primary btn-lg" data-toggle="modal"
+                data-target="#modalExemplo" hidden>DIFICULDADE</button>
+
+        <div class="form-group col-sm-3" style="margin: 0 auto; margin-top: 5px;">
+            <label for="modoJogo">Modo de Jogo</label>
+            <select class="form-control" id="modoJogo" onchange="modoParaJogar()">
+                <option value="0" selected>CORES</option>
+                <option value="1">CARACTERES</option>
+            </select>
+        </div>
+    </div>
+
+    <div>
+        <div id="resultadoResposta" role="alert" class="alert alert-success"></div>
+    </div>
+
+    <div class="form-group col-sm-9 col-md-6" id="campoEscrita">
+        <label for="campoEscrever">INFORME A SEQUÊNCIA APRESENTADA</label>
+        <input type="text" class="form-control" id="campoEscrever" placeholder="Digite a sequência aqui" disabled>
+        <button class="btn btn-outline-secondary" type="button" style="margin-top: 5px;" id="btn-enviar"
+                onclick="validaSequencia()">ENVIAR</button>
+        <button class="btn btn-outline-danger" type="button" style="margin-top: 5px; margin: 0 auto;" id="btn-reiniciar"
+                onclick="location.reload();">REINICIAR</button>
+    </div>
+
+    <div class="form-group col-sm-9 col-md-6" id="campoCor">
+        <label for="campoEscrever">SELECIONE A SEQUÊNCIA APRESENTADA</label>
+
+        <div class="" style="display: inline-flex; clear: both">
+            <div id="quadro1" onclick="coresArmazenador('1');"></div>
+            <div id="quadro2" onclick="coresArmazenador('2');"></div>
+            <div id="quadro3" onclick="coresArmazenador('3');"></div>
+            <div id="quadro4" onclick="coresArmazenador('4');"></div>
+        </div>
+        <button class="btn btn-outline-secondary" type="button" style="margin-top: 5px;" id="btn-enviar2"
+                onclick="validaSequencia()">ENVIAR</button>
+        <button class="btn btn-warning" type="button" style="margin-top: 5px;" id="btn-clear"
+                onclick="clearSequence()">LIMPAR</button>
+        <button class="btn btn-outline-danger" type="button" style="margin-top: 5px; margin: 0 auto;" id="btn-reiniciar2"
+                onclick="location.reload();">REINICIAR</button>
+    </div>
+
+    <div>
+        <br><br>
+        <h4 style="text-align: center" class="lead"><b>Regras do jogo</b></h4>
+        <p style="text-align: center" class="lead text-left">1- Você deve reescrever a sequência de caracteres
+            gerados no decorrer do jogo.<br>
+            2- Se sua resposta coincidir com a sequência que foi gerada, você avança para uma etapa cada vez mais difícil.<br>
+            3- Quanto mais você acerta, mais difícil o jogo fica, pois sempre é gerado um caracter a mais na sequência.<br>
+            4- O jogo não possui um fim, pois trata-se de quanto você consegue memorizar e reescrever a sequência gerada.<br>
+            5- Ao errar, o jogo lhe avisará que errou e você terá que recomeçar novamente, porém começara com outra sequência.<br>
+            6- Tente acertar e conseguir o máximo de pontos possível, e veja o quanto você é capaz de memorizar. Boa sorte!</p>
+    </div>
+
+</div>
+
+<div class="modal fade" id="modalExemplo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">SELECIONE A DIFICULDADE DO JOGO</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="dificuldadeSelect">Selecione a Dificuldade</label>
+                    <select class="form-control" id="dificuldadeSelect" onchange="nivelDificuldade()">
+                        <option value="0">FÁCIL</option>
+                        <option value="1" selected>MÉDIO (Padrão)</option>
+                        <option value="2">DIFÍCIL</option>
+                        <option value="3">EXTREMO</option>
+                    </select>
+                </div>
+                <p style="text-align: center" class="lead text-left">
+                    <b>FÁCIL: </b>Contém apenas 4 Letras<br>
+                    <b>MÉDIO (Padrão): </b>4 Letras e 4 Números<br>
+                    <b>DIFÍCIL: </b>Todas as Letras do Alfabeto<br>
+                    <b>EXTREMO: </b>Todo o Alfabeto com Números<br>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">GRAVAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    var sequencia = "";
+    var pontuacao = 0;
+    var dificuldade = "1";
+    var mododeJogo = "0";
+    var armazenaCores = "";
+
+    function gameMode() {
+        mododeJogo = $('#modoJogo').val();
+
+        if(mododeJogo == "0"){
+            $('#campoCor').css('display', 'block');
+        }
+        if(mododeJogo == "1"){
+            $('#campoEscrita').css('display', 'block');
+        }
+    }
+
+    function modoParaJogar() {
+        mododeJogo = $('#modoJogo').val();
+
+        if(mododeJogo == "0"){
+            $('#btn-dificuldade').attr('hidden', 'hidden');
+        }
+        if(mododeJogo == "1"){
+            $('#btn-dificuldade').removeAttr('hidden');
+        }
+    }
+
+    function nivelDificuldade() {
+        dificuldade = $('#dificuldadeSelect').val();
+        switch (dificuldade) {
+            case "0":
+                $('#nivelJogo').text(" (Fácil)"); break;
+            case "1":
+                $('#nivelJogo').text(" (Médio)"); break;
+            case "2":
+                $('#nivelJogo').text(" (Difícil)"); break;
+            case "3":
+                $('#nivelJogo').text(" (Extremo)"); break;
+        }
+    }
+
+    //esconde o botão de INICIO, e chama o gerador de sequencias
+    function escondeInicio() {
+        gameMode();
+        var x = document.getElementById("musica");
+        x.play();
+
+        $('#btn-iniciar').css('display', 'none');
+        geradorSequencia();
+    }
+
+    //Função para gerar a sequencia randomicamente
+    function geradorSequencia() {
+        var caracteres = "";
+        if(mododeJogo == "0"){
+            $('#btn-dificuldade').attr('hidden', 'hidden');
+            caracteres = "1234";
+        } else {
+            switch (dificuldade) {
+                case "0":
+                    caracteres = "ABCD"; break;
+                case "1":
+                    caracteres = "ABCD1234"; break;
+                case "2":
+                    caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; break;
+                case "3":
+                    caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; break;
+            }
+        }
+
+        //sorteia um caracter e concatena numa GLOBAL para armazenar o percurso
+        var gerado = caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+        sequencia += gerado;
+
+        //chama a função para imprimir na tela
+        imprimeTela(sequencia);
+    }
+
+    function imprimeTela(sequenciaGerada) {
+
+        //transforma toda a sequencia em array
+        var imprimir = sequenciaGerada.split("");
+        let contador = 0;
+
+        //enquanto contador menor que o tamanho da sequencia, faça loop de impressão
+        while (contador < sequenciaGerada.length) {
+            imprimirSequencia(imprimir[contador]);
+            contador++;
+        }
+
+        //Limpa o campo que mostra o valor
+        if(contador == sequenciaGerada.length){
+            imprimirSequencia(" ");
+        }
+
+        //imprime a sequencia na tela conforme for gerado pelo sistema
+        function imprimirSequencia(valorGerado) {
+
+            if(mododeJogo == "0"){
+                setTimeout(function() {
+                    //imprime na tela
+                    if(valorGerado == "1"){
+                        $('#campoGerador').css('background-color', 'red');
+                    }
+                    if(valorGerado == "2"){
+                        $('#campoGerador').css('background-color', 'blue');
+                    }
+                    if(valorGerado == "3"){
+                        $('#campoGerador').css('background-color', 'yellow');
+                    }
+                    if(valorGerado == "4"){
+                        $('#campoGerador').css('background-color', 'green');
+                    }
+
+                    //coloca um espaço em branco para mostrar outro caracter
+                    setTimeout(function() {
+                        $('#campoGerador').css('background-color', '#dc354500');
+                        $('#campoGerador').css('color', '#dc354500');
+                    }, 600);
+
+                    //se o valor gerado for igual a branco, então é liberado a escrita
+                    if(valorGerado == " "){
+                        liberaEscrita();
+                    }
+                }, 1000 * contador);
+            } else {
+                setTimeout(function() {
+                    //imprime na tela
+                    $('#campoGerador').text(valorGerado);
+                    $('#campoGerador').css('color', '#212529');
+
+                    //coloca um espaço em branco para mostrar outro caracter
+                    setTimeout(function() {
+                        $('#campoGerador').css('color', '#dc354500');
+                    }, 600);
+
+                    //se o valor gerado for igual a branco, então é liberado a escrita
+                    if(valorGerado == " "){
+                        liberaEscrita();
+                    }
+                }, 1000 * contador);
+            }
+        }
+    }
+
+    //libera o campo para escrever novamente
+    function liberaEscrita() {
+        $('#campoGerador').css('color', '#f3f3f3');
+        $('#campoEscrever').removeAttr('disabled');
+        $('#campoEscrever').focus();
+    }
+
+    //armazena as cores selecionadas
+    function coresArmazenador(numeroCor){
+        if(numeroCor == "1"){
+            $('#quadro1').text("OK");
+            setTimeout(function() {
+                $('#quadro1').text("");
+            }, 600);
+        }
+        if(numeroCor == "2"){
+            $('#quadro2').text("OK");
+            setTimeout(function() {
+                $('#quadro2').text("");
+            }, 600);
+        }
+        if(numeroCor == "3"){
+            $('#quadro3').text("OK");
+            setTimeout(function() {
+                $('#quadro3').text("");
+            }, 600);
+        }
+        if(numeroCor == "4"){
+            $('#quadro4').text("OK");
+            setTimeout(function() {
+                $('#quadro4').text("");
+            }, 600);
+        }
+
+        armazenaCores += numeroCor;
+
+    }
+
+    //valida se a sequencia informada pelo usuário está correta
+    function validaSequencia() {
+        //recupera o valor digitado pelo usuário
+        if(mododeJogo == "0"){
+            var enviado = armazenaCores;
+            armazenaCores = "";
+        } else {
+            var enviado = $('#campoEscrever').val();
+
+            //limpa o campo de escrever
+            $('#campoEscrever').val('');
+            $('#campoEscrever').attr('disabled', 'disabled');
+        }
+
+        //Verifica se a tecla digitada é igual a sequência gerada
+        if(enviado.toLowerCase() == sequencia.toLowerCase()){
+            var y = document.getElementById("musicaCerta");
+            y.play();
+            calculaPontuacao();
+            $('#resultadoResposta').css('display', 'block');
+            $('#resultadoResposta').text('CORRETO');
+            $("#resultadoResposta").delay(1000);
+            $("#resultadoResposta").fadeOut(800);
+            geradorSequencia();
+        } else {
+            var x = document.getElementById("musica");
+            x.pause();
+            var y = document.getElementById("musicaErro");
+            y.play();
+            $('#resultadoResposta').css('display', 'block');
+            $('#resultadoResposta').removeAttr('class');
+            $('#resultadoResposta').attr('class', 'alert alert-danger');
+            if(mododeJogo == "0"){
+                $('#resultadoResposta').text('ERROU A SEQUÊNCIA DAS CORES!');
+            } else {
+                $('#resultadoResposta').text('ERROU A SEQUÊNCIA: '+sequencia);
+            }
+            $('#btn-enviar').css('display', 'none');
+            if(mododeJogo == "1"){
+                $('#btn-reiniciar').css('display', 'block');
+            }
+            if(mododeJogo == "0"){
+                $('#btn-reiniciar2').css('display', 'block');
+            }
+
+        }
+    }
+
+    //Valida quando a tecla ENTER for apertada para enviar o resultado
+    $('#campoEscrever').on('keydown',function(tecla) {
+        if(tecla.key == 'Enter'){
+            validaSequencia();
+        }
+    });
+
+    //calcula a pontuaçao
+    function calculaPontuacao(){
+        if(sequencia.length <= 3){
+            pontuacao += 2;
+        }
+        if(sequencia.length > 3 && sequencia.length <= 5){
+            pontuacao += 3;
+        }
+        if(sequencia.length > 5 && sequencia.length <= 7){
+            pontuacao += 5;
+        }
+        if(sequencia.length > 7 && sequencia.length <= 10){
+            pontuacao += 7;
+        }
+        if(sequencia.length > 10 && sequencia.length <= 15){
+            pontuacao += 10;
+        }
+        if(sequencia.length > 15 && sequencia.length <= 21){
+            pontuacao += 15;
+        }
+        if(sequencia.length > 21 && sequencia.length <= 30){
+            pontuacao += 18;
+        }
+        if(sequencia.length > 30 && sequencia.length <= 38){
+            pontuacao += 23;
+        }
+        if(sequencia.length > 38 && sequencia.length <= 50){
+            pontuacao += 30;
+        }
+        if(sequencia.length > 50 && sequencia.length <= 75){
+            pontuacao += 35;
+        }
+        if(sequencia.length > 75 && sequencia.length <= 100){
+            pontuacao += 42
+        }
+        if(sequencia.length > 100){
+            pontuacao += 50;
+        }
+
+        $('#pontuacao').text(pontuacao);
+    }
+
+    function clearSequence() {
+        armazenaCores = "";
+        alert("Sequência informada foi reiniciada. Selecione a sequencia novamente!");
+    }
+</script>
+</html>
